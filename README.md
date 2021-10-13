@@ -1,1 +1,1 @@
-This is a list of the Leetcode problems that I've done for practice in the past.
+Leetcode practice problems

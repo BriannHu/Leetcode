@@ -1,3 +1,5 @@
+// MEDIUM - https://leetcode.com/problems/perfect-squares/
+
 public class PerfectSquares {
 
     public int PerfectSquares(int n) {

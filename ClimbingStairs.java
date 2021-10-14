@@ -1,3 +1,5 @@
+// EASY - https://leetcode.com/problems/climbing-stairs/
+
 public class ClimbingStairs {
 
     public int ClimbingStairs(int n) {

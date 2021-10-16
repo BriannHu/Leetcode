@@ -1,97 +1,66 @@
 // MEDIUM - https://leetcode.com/problems/lru-cache/
 
+// simpler implementation from https://www.reddit.com/r/cscareerquestions/comments/4ogkpt/level_of_complexity_when_asked_to_code_a_lru_cache/
+
 import java.util.HashMap;
 
-public class LRUCache {
+class LRUCache {
 
-    class DLLNode { // doubly linked list node
-        int key;
-        int value;
-        DLLNode prev;
-        DLLNode next;
-    }
-
-    // add right after head (pseudo null)
-    private void addNode(DLLNode node) {
-        node.prev = head;
-        node.next = head.next;
-
-        head.next.prev = node;
-        head.next = node;
-    }
-
-    // remove existing node
-    private void removeNode(DLLNode node) {
-        DLLNode prevNode = node.prev;
-        DLLNode nextNode = node.next;
-
-        prevNode.next = nextNode;
-        nextNode.prev = prevNode;
-    }
-
-    // move node to right after head
-    private void moveToHead(DLLNode node) {
-        this.removeNode(node);
-        this.addNode(node);
-    }
-
-    // retrieve and remove tail
-    private DLLNode popTail() {
-        DLLNode res = tail.prev;
-        this.removeNode(res);
-        return res;
-    }
-
-    int capacity;
-    int count;
-    HashMap<Integer, DLLNode> cache = new HashMap<>();
-    DLLNode head, tail;
+    private int capacity;
+    private HashMap<Integer, Node> cache;
+    private Node head, tail;
 
     public LRUCache(int capacity) {
         this.capacity = capacity;
-        this.count = 0;
-
-        head = new DLLNode();
-        head.prev = null;
-
-        tail = new DLLNode();
-        tail.next = null;
-
+        cache = new HashMap<>(Math.min(Integer.MAX_VALUE / 2, capacity) * 2);
+        head = new Node();
+        tail = new Node();
         head.next = tail;
         tail.prev = head;
     }
 
     public int get(int key) {
-        DLLNode node = cache.get(key);
-
-        if (node == null) {
+        Node result = cache.get(key);
+        if (result == null)
             return -1;
-        }
 
-        this.moveToHead(node);
-        return node.value;
+        removeNode(result);
+        addNode(result);
+
+        return result.val;
     }
 
-    public void put(int key, int value) {
-        DLLNode node = cache.get(key);
-
-        if (node == null) {
-            DLLNode newNode = new DLLNode();
-            newNode.key = key;
-            newNode.value = value;
-
-            this.cache.put(key, newNode);
-            this.addNode(newNode);
-            count++;
-
-            if (count > capacity) {
-                DLLNode res = this.popTail();
-                this.cache.remove(res.key);
-                count--;
-            }
-        } else {
-            node.value = value;
-            this.moveToHead(node);
+    public void set(int key, int value) {
+        Node node = cache.get(key);
+        if (node != null) {
+            removeNode(node);
         }
+        Node newNode = new Node();
+        newNode.key = key;
+        newNode.val = value;
+        addNode(newNode);
+
+        if (cache.size() > capacity) {
+            removeNode(tail.prev);
+        }
+    }
+
+    private void removeNode(Node node) {
+        cache.remove(node.key);
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private void addNode(Node node) {
+        cache.put(node.key, node);
+        node.prev = head;
+        node.next = head.next;
+        head.next.prev = node;
+        head.next = node;
+    }
+
+    static class Node {
+        int key, val;
+        Node prev, next;
     }
 }

@@ -28,4 +28,4 @@ public class SumRootToLeafNumbers {
         }
         return sumNodes(root.left, sum * 10 + root.val) + sumNodes(root.right, sum * 10 + root.val);
     }
-    }
+}
